@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Apartment Deal Calculator – Apartment Investing Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0B1628;
+    --gold: #C8880A;
+    --gold-dim: rgba(200,136,10,0.12);
+    --gray: #5a6a85;
+    --green: #16a34a;
+    --bg: #ffffff;
+    --mid: #f4f6fa;
+    --light: #eef1f7;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior:smooth; }
+  body { background:var(--bg); color:var(--navy); font-family:'DM Sans',sans-serif; overflow-x:hidden; }
+
+  /* HERO */
+  .hero {
+    background:#fff; padding:70px 24px 80px;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  .hero::before {
+    content:''; position:absolute; top:-60px; left:50%;
+    transform:translateX(-50%); width:700px; height:500px;
+    background:radial-gradient(ellipse,rgba(200,136,10,0.09) 0%,transparent 70%);
+    pointer-events:none;
+  }
+  .hero > * { position:relative; z-index:1; }
+
+  .badge {
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--gold-dim); border:1px solid rgba(200,136,10,0.35);
+    border-radius:100px; padding:7px 18px;
+    font-size:12px; font-weight:700; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:24px;
+  }
+  .badge-dot { width:7px; height:7px; background:var(--gold); border-radius:50%; animation:pulse 1.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.4)} }
+
+  .eyebrow { font-size:13px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; }
+  .hero-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(52px,9vw,106px); line-height:0.92; letter-spacing:0.02em; color:var(--navy); margin-bottom:10px; }
+  .hero-title span { color:var(--gold); display:block; }
+  .hero-sub { font-size:clamp(15px,2vw,19px); color:#3a4f6e; max-width:560px; margin:16px auto 0; line-height:1.65; }
+
+  /* PROOF STRIP */
+  .proof { background:var(--mid); border-top:1px solid rgba(200,136,10,0.12); border-bottom:1px solid rgba(200,136,10,0.12); padding:24px 16px; display:flex; justify-content:center; flex-wrap:wrap; }
+  .proof-item { display:flex; align-items:center; gap:10px; padding:8px 28px; border-right:1px solid rgba(11,22,40,0.1); }
+  .proof-item:last-child { border-right:none; }
+  .proof-num { font-family:'Bebas Neue',sans-serif; font-size:34px; color:var(--gold); line-height:1; }
+  .proof-lbl { font-size:12px; color:var(--gray); max-width:80px; line-height:1.4; }
+  @media(max-width:600px){ .proof-item { border-right:none; border-bottom:1px solid rgba(11,22,40,0.08); width:50%; } .proof-item:nth-child(even){ border-right:none; } }
+
+  /* FEATURES */
+  .features { padding:80px 24px; max-width:1060px; margin:0 auto; }
+  .sec-label { font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); text-align:center; margin-bottom:10px; }
+  .sec-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,64px); text-align:center; line-height:1; margin-bottom:48px; }
+  .sec-title em { font-style:normal; color:var(--gold); }
+  .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; }
+  .fcard { background:var(--light); border:1px solid rgba(11,22,40,0.08); border-radius:12px; padding:28px 24px; transition:transform 0.2s,border-color 0.2s,box-shadow 0.2s; position:relative; overflow:hidden; }
+  .fcard::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg,var(--gold),transparent); opacity:0; transition:opacity 0.2s; }
+  .fcard:hover { transform:translateY(-3px); border-color:rgba(200,136,10,0.3); box-shadow:0 16px 40px rgba(0,0,0,0.08); }
+  .fcard:hover::before { opacity:1; }
+  .ficon { font-size:22px; margin-bottom:14px; }
+  .ftitle { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:0.04em; margin-bottom:8px; }
+  .fdesc { font-size:13px; color:var(--gray); line-height:1.65; }
+
+  /* CHECKLIST */
+  .checklist-section { background:var(--mid); border-top:1px solid rgba(200,136,10,0.08); padding:90px 24px; }
+  .checklist-inner { max-width:900px; margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+  @media(max-width:720px){ .checklist-inner { grid-template-columns:1fr; } .stack-visual { display:none; } }
+  .cl-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,60px); line-height:1; margin-bottom:12px; }
+  .cl-title em { font-style:normal; color:var(--gold); }
+  .cl-body { font-size:15px; color:var(--gray); line-height:1.6; margin-bottom:28px; }
+  .check-list { list-style:none; display:flex; flex-direction:column; gap:14px; }
+  .check-list li { display:flex; align-items:flex-start; gap:12px; font-size:15px; color:#1e324f; line-height:1.5; }
+  .check-icon { width:22px; height:22px; background:rgba(22,163,74,0.12); border:1px solid rgba(22,163,74,0.35); border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:2px; }
+  .stack-visual { position:relative; height:310px; }
+  .stack-card { position:absolute; width:100%; max-width:330px; background:#fff; border:1px solid rgba(200,136,10,0.18); border-radius:12px; padding:22px 24px; box-shadow:0 8px 30px rgba(0,0,0,0.08); }
+  .stack-card:nth-child(1){ top:0; left:20px; transform:rotate(-3deg); opacity:0.45; }
+  .stack-card:nth-child(2){ top:22px; left:8px; transform:rotate(-1deg); opacity:0.72; }
+  .stack-card:nth-child(3){ top:44px; left:0; }
+  .sc-label { font-size:10px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+  .sc-row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid rgba(11,22,40,0.07); font-size:13px; }
+  .sc-row:last-of-type { border-bottom:none; }
+  .sc-lbl { color:var(--gray); }
+  .sc-val { font-weight:600; }
+  .sc-val.g { color:var(--gold); }
+  .sc-val.gr { color:var(--green); }
+  .sc-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(22,163,74,0.1); border:1px solid rgba(22,163,74,0.3); border-radius:100px; padding:4px 12px; font-size:11px; font-weight:600; color:var(--green); margin-top:12px; }
+
+  /* FORM SECTION */
+  .form-section { padding:90px 24px 100px; background:#fff; position:relative; overflow:hidden; }
+  .form-section::before { content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:700px; height:500px; background:radial-gradient(ellipse,rgba(200,136,10,0.07) 0%,transparent 70%); pointer-events:none; }
+  .form-inner { max-width:680px; margin:0 auto; position:relative; z-index:1; }
+  .form-intro { font-size:16px; color:var(--gray); margin:10px 0 36px; line-height:1.6; text-align:center; }
+
+  /* FORM FIELDS */
+  .field-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:14px; }
+  @media(max-width:540px){ .field-row { grid-template-columns:1fr; } }
+  .field-group { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+  .field-group:last-of-type { margin-bottom:0; }
+  .field-label { font-size:13px; font-weight:600; color:var(--navy); }
+  .req { color:var(--gold); }
+  .form-divider { height:1px; background:rgba(11,22,40,0.08); margin:20px 0; }
+
+  .fi {
+    width:100%; padding:14px 16px;
+    background:#fff; border:2px solid rgba(11,22,40,0.12);
+    border-radius:8px; font-family:'DM Sans',sans-serif;
+    font-size:14px; color:var(--navy); outline:none;
+    transition:border-color 0.2s,box-shadow 0.2s;
+    box-shadow:0 1px 4px rgba(0,0,0,0.04);
+  }
+  .fi::placeholder { color:#a0aec0; }
+  .fi:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(200,136,10,0.12); }
+  .fi.err { border-color:#e53e3e; box-shadow:0 0 0 3px rgba(229,62,62,0.1); }
+  select.fi { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235a6a85' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 14px center; padding-right:38px; cursor:pointer; }
+
+  .radio-group { display:flex; flex-wrap:wrap; gap:8px; }
+  .rpill { display:flex; align-items:center; gap:6px; padding:8px 15px; background:var(--mid); border:2px solid rgba(11,22,40,0.10); border-radius:100px; font-size:13px; font-weight:500; color:#3a4f6e; cursor:pointer; transition:border-color 0.15s,background 0.15s,color 0.15s; user-select:none; }
+  .rpill input[type=radio] { display:none; }
+  .rpill.on { background:var(--gold-dim); border-color:var(--gold); color:var(--navy); font-weight:700; }
+  .rpill:hover { border-color:rgba(200,136,10,0.4); background:rgba(200,136,10,0.06); }
+  .radio-group.err .rpill { border-color:rgba(229,62,62,0.35); }
+
+  .submit-btn {
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    background:linear-gradient(135deg,var(--gold) 0%,#a06208 100%);
+    color:#fff; font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:0.06em;
+    padding:18px 32px; border-radius:8px; border:none; cursor:pointer; margin-top:10px;
+    box-shadow:0 6px 28px rgba(200,136,10,0.3);
+    transition:transform 0.18s,box-shadow 0.18s;
+    position:relative; overflow:hidden;
+  }
+  .submit-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 60%); pointer-events:none; }
+  .submit-btn:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(200,136,10,0.45); }
+
+  .form-note { display:flex; align-items:center; justify-content:center; gap:6px; font-size:12px; color:var(--gray); margin-top:16px; }
+  .err-msg { font-size:13px; color:#e53e3e; text-align:center; min-height:20px; font-weight:500; margin-top:6px; }
+
+  /* SUCCESS */
+  #success-box { display:none; flex-direction:column; align-items:center; gap:14px; max-width:480px; margin:0 auto; padding:52px 36px; background:var(--mid); border:1px solid rgba(11,22,40,0.08); border-radius:16px; text-align:center; }
+  .s-icon { width:64px; height:64px; background:rgba(22,163,74,0.12); border:2px solid rgba(22,163,74,0.35); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; color:var(--green); font-weight:700; }
+  .s-title { font-family:'Bebas Neue',sans-serif; font-size:48px; color:var(--navy); letter-spacing:0.04em; }
+  .s-body { font-size:15px; color:var(--gray); line-height:1.6; max-width:340px; }
+  .s-btn { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--gold),#a06208); color:#fff; font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:0.06em; padding:14px 32px; border-radius:6px; border:none; cursor:pointer; margin-top:8px; box-shadow:0 6px 24px rgba(200,136,10,0.3); }
+
+  /* FOOTER */
+  footer { background:var(--light); border-top:1px solid rgba(11,22,40,0.07); padding:24px; text-align:center; font-size:12px; color:rgba(90,106,133,0.7); letter-spacing:0.04em; }
+</style>
+</head>
+<body>
+
+<!-- ══════ HERO ══════ -->
+<section class="hero">
+  <div class="badge"><span class="badge-dot"></span> Free Tool — Instant Access</div>
+  <p class="eyebrow">Apartment Investing Mastery</p>
+  <h1 class="hero-title">Your Free<span>Deal Analyzer</span>Is Ready</h1>
+  <p class="hero-sub">The same institutional-grade underwriting tool used to analyze real apartment deals — now yours free. Run a full go/no-go analysis in under 5 minutes.</p>
+</section>
+
+<!-- ══════ PROOF ══════ -->
+<div class="proof">
+  <div class="proof-item"><div class="proof-num">6</div><div class="proof-lbl">Sheets in one workbook</div></div>
+  <div class="proof-item"><div class="proof-num">12+</div><div class="proof-lbl">Key metrics auto-calculated</div></div>
+  <div class="proof-item"><div class="proof-num">5</div><div class="proof-lbl">Min to full underwrite</div></div>
+  <div class="proof-item"><div class="proof-num">100%</div><div class="proof-lbl">Free — no credit card</div></div>
+</div>
+
+<!-- ══════ FEATURES ══════ -->
+<section class="features">
+  <p class="sec-label">What's Inside</p>
+  <h2 class="sec-title">Six Tabs. <em>One Decision.</em></h2>
+  <div class="features-grid">
+    <div class="fcard"><div class="ficon">📋</div><div class="ftitle">Instructions Tab</div><div class="fdesc">Step-by-step walkthrough so you're never lost. Color-coded cells show exactly what to fill in vs. what auto-calculates.</div></div>
+    <div class="fcard"><div class="ficon">🏗️</div><div class="ftitle">Inputs Tab</div><div class="fdesc">Enter your purchase price, rents, expenses, and financing once. Every other sheet updates automatically.</div></div>
+    <div class="fcard"><div class="ficon">🏦</div><div class="ftitle">Loan Engine</div><div class="fdesc">Bank-accurate PMT formulas. Supports conventional, interest-only, and ARM loans — with BRRRR refinance modeling built in.</div></div>
+    <div class="fcard"><div class="ficon">📊</div><div class="ftitle">Cash Flow & DSCR</div><div class="fdesc">Full 12-month cash flow projection. DSCR calculated automatically — know if a bank will fund your deal before you call them.</div></div>
+    <div class="fcard"><div class="ficon">💧</div><div class="ftitle">Waterfall Tab</div><div class="fdesc">LP/GP equity split with preferred return tiers and MOIC. Show investors exactly what they earn.</div></div>
+    <div class="fcard"><div class="ficon">🎯</div><div class="ftitle">Deal Summary Dashboard</div><div class="fdesc">One-page investor-ready output. Cap rate, CoC return, IRR, and go/no-go signal — everything a lender needs to say yes.</div></div>
+  </div>
+</section>
+
+<!-- ══════ CHECKLIST ══════ -->
+<section class="checklist-section">
+  <div class="checklist-inner">
+    <div>
+      <p class="sec-label" style="text-align:left;">What You'll Know</p>
+      <h2 class="cl-title">After Your<br><em>First Deal</em></h2>
+      <p class="cl-body">Most investors pass on profitable deals because the numbers look confusing. This tool kills that problem. Run it once and you'll know exactly what to say yes — and no — to.</p>
+      <ul class="check-list">
+        <li><div class="check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Whether the deal cash flows from day one</li>
+        <li><div class="check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Exactly what cap rate and DSCR a lender expects</li>
+        <li><div class="check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>How to structure equity for private investors</li>
+        <li><div class="check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>Your maximum allowable offer — calculated to the dollar</li>
+        <li><div class="check-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>What a BRRRR refi looks like on your specific numbers</li>
+      </ul>
+    </div>
+    <div class="stack-visual">
+      <div class="stack-card"></div>
+      <div class="stack-card"></div>
+      <div class="stack-card">
+        <div class="sc-label">Deal Snapshot</div>
+        <div class="sc-row"><span class="sc-lbl">Cap Rate</span><span class="sc-val g">7.8%</span></div>
+        <div class="sc-row"><span class="sc-lbl">DSCR</span><span class="sc-val gr">1.42x</span></div>
+        <div class="sc-row"><span class="sc-lbl">CoC Return</span><span class="sc-val gr">11.3%</span></div>
+        <div class="sc-row"><span class="sc-lbl">Monthly CF</span><span class="sc-val gr">+$1,940</span></div>
+        <div class="sc-row"><span class="sc-lbl">MAO</span><span class="sc-val g">$810,000</span></div>
+        <div class="sc-badge"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Deal Verdict: GO</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════ LEAD FORM (Netlify) ══════ -->
+<section class="form-section" id="get-access">
+  <div class="form-inner">
+    <p class="sec-label" style="text-align:center;">Get Instant Access</p>
+    <h2 class="sec-title" style="text-align:center;">Claim Your <em>Free Tool</em></h2>
+    <p class="form-intro">Fill out the form below and we'll send the Apartment Deal Analyzer V3.1 straight to your inbox — free.</p>
+
+    <!-- netlify attribute enables Netlify Forms; hidden input is required -->
+    <form name="deal-calculator-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="lead-form">
+      <input type="hidden" name="form-name" value="deal-calculator-leads" />
+      <p style="display:none;"><input name="bot-field" /></p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">First Name <span class="req">*</span></label>
+          <input type="text" name="first-name" class="fi" id="f-fname" placeholder="First Name" autocomplete="given-name" required />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Last Name <span class="req">*</span></label>
+          <input type="text" name="last-name" class="fi" id="f-lname" placeholder="Last Name" autocomplete="family-name" required />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Email Address <span class="req">*</span></label>
+          <input type="email" name="email" class="fi" id="f-email" placeholder="you@email.com" autocomplete="email" required />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Phone Number <span class="req">*</span></label>
+          <input type="tel" name="phone" class="fi" id="f-phone" placeholder="(555) 000-0000" autocomplete="tel" required />
+        </div>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Experience Level <span class="req">*</span></label>
+        <div class="radio-group" id="rg-exp">
+          <label class="rpill" onclick="pick(this,'rg-exp')"><input type="radio" name="experience" value="Just Getting Started" /> Just Getting Started</label>
+          <label class="rpill" onclick="pick(this,'rg-exp')"><input type="radio" name="experience" value="Some Experience" /> Some Experience</label>
+          <label class="rpill" onclick="pick(this,'rg-exp')"><input type="radio" name="experience" value="Active Investor" /> Active Investor</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Target Investment Markets <span class="req">*</span></label>
+        <input type="text" name="markets" class="fi" id="f-markets" placeholder="e.g. Atlanta, GA · Cleveland, OH · Dallas, TX" required />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Investment Timeline <span class="req">*</span></label>
+        <select name="timeline" class="fi" id="f-timeline" required>
+          <option value="" disabled selected>Select your timeline…</option>
+          <option>Ready Now / ASAP</option>
+          <option>3–6 Months</option>
+          <option>6–12 Months</option>
+          <option>Just Exploring for Now</option>
+        </select>
+      </div>
+
+      <div class="form-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Capital Available to Invest</label>
+        <div class="radio-group" id="rg-cap">
+          <label class="rpill" onclick="pick(this,'rg-cap')"><input type="radio" name="capital" value="Under $25K" /> Under $25K</label>
+          <label class="rpill" onclick="pick(this,'rg-cap')"><input type="radio" name="capital" value="$25K–$100K" /> $25K–$100K</label>
+          <label class="rpill" onclick="pick(this,'rg-cap')"><input type="radio" name="capital" value="$100K–$250K" /> $100K–$250K</label>
+          <label class="rpill" onclick="pick(this,'rg-cap')"><input type="radio" name="capital" value="$250K+" /> $250K+</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Property Size Interest</label>
+        <div class="radio-group" id="rg-size">
+          <label class="rpill" onclick="pick(this,'rg-size')"><input type="radio" name="property-size" value="Small (2–4 units)" /> Small (2–4 units)</label>
+          <label class="rpill" onclick="pick(this,'rg-size')"><input type="radio" name="property-size" value="Mid (5–20 units)" /> Mid (5–20 units)</label>
+          <label class="rpill" onclick="pick(this,'rg-size')"><input type="radio" name="property-size" value="Large (20+ units)" /> Large (20+ units)</label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Biggest Challenge Right Now <span class="req">*</span></label>
+        <select name="challenge" class="fi" id="f-challenge" required>
+          <option value="" disabled selected>Select your biggest challenge…</option>
+          <option>Finding Deals</option>
+          <option>Funding the Deal</option>
+          <option>Analyzing Deals / Running Numbers</option>
+          <option>Don't Know Where to Start</option>
+        </select>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How Did You Hear About Us?</label>
+        <div class="radio-group" id="rg-source">
+          <label class="rpill" onclick="pick(this,'rg-source')"><input type="radio" name="source" value="Facebook" /> Facebook</label>
+          <label class="rpill" onclick="pick(this,'rg-source')"><input type="radio" name="source" value="Instagram" /> Instagram</label>
+          <label class="rpill" onclick="pick(this,'rg-source')"><input type="radio" name="source" value="LinkedIn" /> LinkedIn</label>
+          <label class="rpill" onclick="pick(this,'rg-source')"><input type="radio" name="source" value="Referral" /> Referral</label>
+          <label class="rpill" onclick="pick(this,'rg-source')"><input type="radio" name="source" value="Other" /> Other</label>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Send Me the Free Calculator
+      </button>
+      <p class="err-msg" id="form-err"></p>
+    </form>
+
+    <!-- Success state (shown after JS submit) -->
+    <div id="success-box">
+      <div class="s-icon">✓</div>
+      <div class="s-title">You're In!</div>
+      <p class="s-body">Check your inbox — the Apartment Deal Analyzer V3.1 is on its way. While you wait, explore the full course.</p>
+      <button class="s-btn">Explore the Full Course <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </div>
+
+    <div class="form-note">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="#16a34a"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      100% free &nbsp;·&nbsp; We respect your privacy &nbsp;·&nbsp; Unsubscribe anytime
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Apartment Investing Mastery &nbsp;·&nbsp; All rights reserved</footer>
+
+<script>
+  // Radio pill toggle
+  function pick(el, groupId) {
+    document.querySelectorAll('#' + groupId + ' .rpill').forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+    el.querySelector('input').checked = true;
+    document.getElementById(groupId).classList.remove('err');
+  }
+
+  // Netlify form submission via fetch (shows success state without page reload)
+  document.getElementById('lead-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = this;
+    const errEl = document.getElementById('form-err');
+    errEl.textContent = '';
+
+    // Validate required radio: experience
+    const expChecked = document.querySelector('input[name="experience"]:checked');
+    if (!expChecked) {
+      document.getElementById('rg-exp').classList.add('err');
+      errEl.textContent = 'Please select your experience level.';
+      return;
+    }
+
+    const body = new URLSearchParams(new FormData(form)).toString();
+
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body
+    })
+    .then(() => {
+      form.style.display = 'none';
+      const sb = document.getElementById('success-box');
+      sb.style.display = 'flex';
+      sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    })
+    .catch(() => {
+      errEl.textContent = 'Something went wrong. Please try again.';
+    });
+  });
+</script>
+</body>
+</html>

@@ -225,10 +225,13 @@
     <h2 class="sec-title" style="text-align:center;">Claim Your <em>Free Tool</em></h2>
     <p class="form-intro">Fill out the form below and we'll send the Apartment Deal Analyzer V3.1 straight to your inbox — free.</p>
 
-    <!-- netlify attribute enables Netlify Forms; hidden input is required -->
-    <form name="deal-calculator-leads" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="lead-form">
-      <input type="hidden" name="form-name" value="deal-calculator-leads" />
-      <p style="display:none;"><input name="bot-field" /></p>
+    <form id="lead-form" novalidate>
+      <!-- Web3Forms -->
+      <input type="hidden" name="access_key" value="9f023e37-9ad7-4d25-b1a5-37997543c307" />
+      <input type="hidden" name="subject" value="New Lead: Free Apartment Deal Calculator" />
+      <input type="hidden" name="from_name" value="Apartment Investing Mastery" />
+      <!-- Honeypot -->
+      <input type="checkbox" name="botcheck" style="display:none;" />
 
       <div class="field-row">
         <div class="field-group">
@@ -355,38 +358,114 @@
     document.getElementById(groupId).classList.remove('err');
   }
 
-  // Netlify form submission via fetch (shows success state without page reload)
-  document.getElementById('lead-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const form = this;
-    const errEl = document.getElementById('form-err');
-    errEl.textContent = '';
+  // ── Validation helpers ──────────────────────────────────────────
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()); }
+  function isValidPhone(v) { return v.replace(/\D/g,'').length >= 7; }
 
-    // Validate required radio: experience
-    const expChecked = document.querySelector('input[name="experience"]:checked');
+  function setFieldError(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add('err');
+    el.removeEventListener('input', el._clearErr, true);
+    el._clearErr = () => { el.classList.remove('err'); showFormErr(''); };
+    el.addEventListener('input', el._clearErr, { once: true });
+  }
+
+  function showFormErr(msg) {
+    document.getElementById('form-err').textContent = msg;
+  }
+
+  function validateForm(form) {
+    let ok = true;
+    showFormErr('');
+
+    // First name
+    const fname = form.querySelector('#f-fname');
+    if (!fname.value.trim()) { setFieldError('f-fname'); ok = false; }
+
+    // Last name
+    const lname = form.querySelector('#f-lname');
+    if (!lname.value.trim()) { setFieldError('f-lname'); ok = false; }
+
+    // Email
+    const email = form.querySelector('#f-email');
+    if (!isValidEmail(email.value)) { setFieldError('f-email'); ok = false; }
+
+    // Phone
+    const phone = form.querySelector('#f-phone');
+    if (!isValidPhone(phone.value)) { setFieldError('f-phone'); ok = false; }
+
+    // Experience (required radio)
+    const expChecked = form.querySelector('input[name="experience"]:checked');
     if (!expChecked) {
       document.getElementById('rg-exp').classList.add('err');
-      errEl.textContent = 'Please select your experience level.';
-      return;
+      ok = false;
     }
 
-    const body = new URLSearchParams(new FormData(form)).toString();
+    // Markets
+    const markets = form.querySelector('#f-markets');
+    if (!markets.value.trim()) { setFieldError('f-markets'); ok = false; }
 
-    fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: body
-    })
-    .then(() => {
-      form.style.display = 'none';
-      const sb = document.getElementById('success-box');
-      sb.style.display = 'flex';
-      sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    })
-    .catch(() => {
-      errEl.textContent = 'Something went wrong. Please try again.';
-    });
+    // Timeline
+    const timeline = form.querySelector('#f-timeline');
+    if (!timeline.value) { setFieldError('f-timeline'); ok = false; }
+
+    // Challenge
+    const challenge = form.querySelector('#f-challenge');
+    if (!challenge.value) { setFieldError('f-challenge'); ok = false; }
+
+    if (!ok) showFormErr('Please fill in all required fields highlighted above.');
+    return ok;
+  }
+
+  // Phone auto-format  (US style)
+  document.getElementById('f-phone').addEventListener('input', function() {
+    let v = this.value.replace(/\D/g,'').slice(0,10);
+    if (v.length >= 7) v = '(' + v.slice(0,3) + ') ' + v.slice(3,6) + '-' + v.slice(6);
+    else if (v.length >= 4) v = '(' + v.slice(0,3) + ') ' + v.slice(3);
+    this.value = v;
+  });
+
+  // ── Submission ───────────────────────────────────────────────────
+  document.getElementById('lead-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const form = this;
+
+    if (!validateForm(form)) return;
+
+    const btn = form.querySelector('.submit-btn');
+    const origHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 0.8s linear infinite"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg> Sending…';
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(form)))
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        form.style.display = 'none';
+        const sb = document.getElementById('success-box');
+        sb.style.display = 'flex';
+        sb.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        showFormErr(data.message || 'Submission failed. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = origHTML;
+      }
+    } catch {
+      showFormErr('Network error — please check your connection and try again.');
+      btn.disabled = false;
+      btn.innerHTML = origHTML;
+    }
   });
 </script>
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .fi.err { border-color: #e53e3e !important; box-shadow: 0 0 0 3px rgba(229,62,62,0.12) !important; }
+</style>
 </body>
 </html>
